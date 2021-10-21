@@ -1,19 +1,18 @@
 from fastapi import FastAPI
 from fastapi import FastAPI, Depends
 from api_pedidos.esquema import Item
+from api_pedidos.esquema import HealthCheckResponse, Item
+from uuid import UUID
 # ...
 
 app = FastAPI()
 
-@app.get("/healthcheck")
-async def healthcheck():
-    return {"status": "ok"}
-
-from uuid import UUID
+@app.get("/healthcheck", tags=["healthcheck"], summary="Integridade do sistema", description="Checa se o servidor está online", response_model=HealthCheckResponse)
+def healthcheck():
+    return HealthCheckResponse(status="ok")
 
 # ...
-
-@app.get("/orders/{identificacao_do_pedido}/items")
+@app.get("/orders/{identificacao_do_pedido}/items", summary="Itens de um pedido", tags=["pedidos"], description="Retorna todos os itens de um determinado pedido", response_model=list[Item])
 def listar_itens(identificacao_do_pedido: UUID):
     pass
 
@@ -21,8 +20,7 @@ def recuperar_itens_por_pedido(identificacao_do_pedido: UUID) -> list[Item]:
     pass
 
 # ...
-
-@app.get("/orders/{identificacao_do_pedido}/items")
+@app.get("/orders/{identificacao_do_pedido}/items", summary="Itens de um pedido", tags=["pedidos"], description="Retorna todos os itens de um determinado pedido", response_model=list[Item])
 def listar_itens(itens: list[Item] = Depends(recuperar_itens_por_pedido)):
     return itens
 
